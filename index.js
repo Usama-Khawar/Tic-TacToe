@@ -1,107 +1,119 @@
 'use strict'
-const gridContainer = document.querySelector('.grid-container')
-let players = []
-let turn
-let itemAdded
+var gridContainer = document.querySelector('.grid-container')
+var startButton = document.getElementById('start')
+var currPlayerElement = document.getElementById('currPlayer')
+var player1Input = document.getElementById('player1')
+var player2Input = document.getElementById('player2')
+var restartButton = document.getElementById('restart')
+var sizeSelect = document.getElementById('mySelect')
+var players = []
+var turn = 0
+var itemAdded = 0
 function start() {
-  const startButton = document.getElementById('start')
   startButton.disabled = true
-  let p = document.getElementById('currPlayer')
-  var x = document.getElementById('mySelect').value
-  const play1 = document.getElementById('player1').value
-  const play2 = document.getElementById('player2').value
-  if (play1.trim() === '' || play2.trim() === '') {
-    alert('provide names of players')
+  var x = sizeSelect.value
+  if (player1Input.value.trim() === '' || player2Input.value.trim() === '') {
+    alert('Provide names of players')
     startButton.disabled = false
   } else {
     players = []
-    var size = Number(x)
-    players.push(play1)
-    players.push(play2)
+    var size_1 = Number(x)
+    players.push(player1Input.value)
+    players.push(player2Input.value)
     turn = 0
     itemAdded = 0
     gridContainer.style.display = 'grid'
     gridContainer.style.gap = '5px'
-    gridContainer.style.gridTemplateRows = `repeat(${size}, minmax(0, 100px))`
-    gridContainer.style.gridTemplateColumns = `repeat(${size}, minmax(0,100px))`
-    const reset = document.getElementById('restart')
-    reset.style.display = 'block'
-    for (let row = 0; row < size; row++) {
-      for (let col = 0; col < size; col++) {
-        const cell = document.createElement('div')
+    gridContainer.style.gridTemplateRows = 'repeat('.concat(
+      size_1,
+      ', minmax(0, 100px))'
+    )
+    gridContainer.style.gridTemplateColumns = 'repeat('.concat(
+      size_1,
+      ', minmax(0,100px))'
+    )
+    restartButton.style.display = 'block'
+    for (var row = 0; row < size_1; row++) {
+      var _loop_1 = function (col) {
+        var cell = document.createElement('div')
         cell.classList.add('cell')
         cell.setAttribute('data-row', row.toString())
         cell.setAttribute('data-column', col.toString())
         cell.textContent = ''
-        p.innerHTML = `${players[turn % 2]}'s turn`
-        cell.addEventListener('click', () => {
-          mainLogic(cell, size)
+        currPlayerElement.innerHTML = ''.concat(players[turn % 2], "'s turn")
+        cell.addEventListener('click', function () {
+          mainLogic(cell, size_1)
         })
         gridContainer.appendChild(cell)
+      }
+      for (var col = 0; col < size_1; col++) {
+        _loop_1(col)
       }
     }
   }
 }
 function mainLogic(cell, size) {
-  let disabled = false
-  let p = document.getElementById('currPlayer')
-  const row = parseInt(cell.getAttribute('data-row'))
-  const col = parseInt(cell.getAttribute('data-column'))
+  var disabled = false
+  var row = parseInt(cell.getAttribute('data-row') || '0', 10)
+  var col = parseInt(cell.getAttribute('data-column') || '0', 10)
   if (cell.textContent === '' && itemAdded < size * size) {
     cell.textContent = turn % 2 === 0 ? 'x' : 'o'
     itemAdded++
     turn++
-    p.innerHTML = `${players[turn % 2]}'s turn`
+    currPlayerElement.innerHTML = ''.concat(players[turn % 2], "'s turn")
   }
-  if (checkRowCol(row, col, cell.textContent, size)) {
-    p.innerHTML = `${players[(turn + 1) % 2]} won`
+  if (checkRowCol(row, col, cell.textContent || '', size)) {
+    currPlayerElement.innerHTML = ''.concat(players[(turn + 1) % 2], ' won')
     disabled = true
     disableGrid()
   }
   if (row === col || row + col === size - 1) {
-    if (checkDiagonals(cell.textContent, size)) {
-      p.innerHTML = `${players[(turn + 1) % 2]} won`
+    if (checkDiagonals(cell.textContent || '', size)) {
+      currPlayerElement.innerHTML = ''.concat(players[(turn + 1) % 2], ' won')
       disabled = true
       disableGrid()
     }
   }
   if (itemAdded >= size * size) {
     if (!disabled) {
-      p.innerHTML = `match drawn`
+      currPlayerElement.innerHTML = 'Match drawn'
       disableGrid()
     }
   }
 }
 function disableGrid() {
-  const gridContainer = document.querySelector('.grid-container')
   gridContainer.classList.add('disabled')
 }
 function resetGame() {
   gridContainer.innerHTML = ''
   gridContainer.classList.remove('disabled')
-  const startButton = document.getElementById('start')
   startButton.disabled = false
-  document.getElementById('currPlayer').textContent = ''
+  currPlayerElement.textContent = ''
   players = []
   turn = 0
   itemAdded = 0
-  document.getElementById('player1').value = ''
-  document.getElementById('player2').value = ''
-  const reset = document.getElementById('restart')
-  reset.style.display = 'none'
+  player1Input.value = ''
+  player2Input.value = ''
+  restartButton.style.display = 'none'
 }
 function checkRowCol(r, c, symbol, size) {
-  let rowCount = 0
-  let colCount = 0
-  for (let i = 0; i < size; i++) {
-    const clickedCellR = document.querySelector(
-      `[data-row="${r}"][data-column="${i}"]`
+  var rowCount = 0
+  var colCount = 0
+  for (var i = 0; i < size; i++) {
+    var clickedCellR = document.querySelector(
+      '[data-row="'.concat(r, '"][data-column="').concat(i, '"]')
     )
-    const rowVal = clickedCellR.textContent
-    const clickedCellC = document.querySelector(
-      `[data-row="${i}"][data-column="${c}"]`
+    var rowVal =
+      (clickedCellR === null || clickedCellR === void 0
+        ? void 0
+        : clickedCellR.textContent) || ''
+    var clickedCellC = document.querySelector(
+      '[data-row="'.concat(i, '"][data-column="').concat(c, '"]')
     )
-    const colVal = clickedCellC.textContent
+    var colVal =
+      (clickedCellC === null || clickedCellC === void 0
+        ? void 0
+        : clickedCellC.textContent) || ''
     if (rowVal === symbol) {
       rowCount++
     }
@@ -109,31 +121,32 @@ function checkRowCol(r, c, symbol, size) {
       colCount++
     }
   }
-  if (rowCount === size || colCount === size) {
-    return true
-  } else return false
+  return rowCount === size || colCount === size
 }
 function checkDiagonals(symbol, size) {
-  let mainDiagonalCount = 0
-  let antiDiagonalCount = 0
-  for (let i = 0; i < size; i++) {
-    const diagonalL = document.querySelector(
-      `[data-row="${i}"][data-column="${i}"]`
+  var mainDiagonalCount = 0
+  var antiDiagonalCount = 0
+  for (var i = 0; i < size; i++) {
+    var diagonalL = document.querySelector(
+      '[data-row="'.concat(i, '"][data-column="').concat(i, '"]')
     )
-    const valL = diagonalL.textContent
+    var valL =
+      (diagonalL === null || diagonalL === void 0
+        ? void 0
+        : diagonalL.textContent) || ''
     if (valL === symbol) {
       mainDiagonalCount++
     }
-    const diagonalR = document.querySelector(
-      `[data-row="${i}"][data-column="${size - i - 1}"]`
+    var diagonalR = document.querySelector(
+      '[data-row="'.concat(i, '"][data-column="').concat(size - i - 1, '"]')
     )
-    const valR = diagonalR.textContent
+    var valR =
+      (diagonalR === null || diagonalR === void 0
+        ? void 0
+        : diagonalR.textContent) || ''
     if (valR === symbol) {
       antiDiagonalCount++
     }
   }
-  if (mainDiagonalCount === size || antiDiagonalCount === size) {
-    return true
-  }
-  return false
+  return mainDiagonalCount === size || antiDiagonalCount === size
 }
