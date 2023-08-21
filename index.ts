@@ -7,7 +7,7 @@ const player1Input = document.getElementById('player1') as HTMLInputElement
 const player2Input = document.getElementById('player2') as HTMLInputElement
 const restartButton = document.getElementById('restart') as HTMLButtonElement
 const sizeSelect = document.getElementById('mySelect') as HTMLSelectElement
-let players: string[] = []
+let players: [string, string] = ['', '']
 let turn = 0
 let itemAdded = 0
 
@@ -18,10 +18,8 @@ function start(): void {
     alert('Provide names of players')
     startButton.disabled = false
   } else {
-    players = []
+    players = [player1Input.value, player2Input.value]
     const size = Number(x)
-    players.push(player1Input.value)
-    players.push(player2Input.value)
     turn = 0
     itemAdded = 0
     gridContainer.style.display = 'grid'
@@ -85,7 +83,7 @@ function resetGame(): void {
   gridContainer.classList.remove('disabled')
   startButton.disabled = false
   currPlayerElement.textContent = ''
-  players = []
+  players = ['', '']
   turn = 0
   itemAdded = 0
   player1Input.value = ''
